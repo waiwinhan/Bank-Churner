@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Churners EDA Dashboard</title>
+    <meta name="description"
+        content="Exploratory Data Analysis of 10,127 credit card customers — churn signals, demographics, and financial patterns.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg-deep: #0f1117;
-            --bg-card: #1a1d2e;
-            --bg-accent: #252a41;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --accent-teal: #00d4aa;
-            --accent-coral: #ff6b6b;
-            --accent-amber: #ffb86c;
-            --font-body: 'DM Sans', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --font-display: 'Space Mono', monospace;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #f8f8f8;
+            --surface: #ffffff;
+            --border: #e5e5e5;
+            --border-dark: #cccccc;
+            --text: #111111;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --accent: #e63946;
+            --accent-light: rgba(230, 57, 70, 0.08);
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --radius: 4px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s ease;
         }
 
         * {
@@ -31,286 +39,356 @@
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
             line-height: 1.6;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
         /* Layout */
-        .dashboard-container {
+        .layout {
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 220px 1fr;
             min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         aside {
-            background-color: var(--bg-card);
-            border-right: 1px solid var(--bg-accent);
-            padding: 2rem 1.5rem;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.25rem;
             position: sticky;
             top: 0;
             height: 100vh;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 2rem;
-            z-index: 100;
         }
 
-        .logo {
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--accent-teal);
+        .brand {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
         }
 
-        .nav-links {
+        .brand-mark {
+            width: 28px;
+            height: 28px;
+            background: var(--text);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-mark svg {
+            color: white;
+        }
+
+        .brand-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 0 0.5rem;
+        }
+
+        nav ul {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 2px;
         }
 
-        .nav-links a {
-            color: var(--text-muted);
+        nav a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
             text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius);
+            border-left: 2px solid transparent;
             transition: var(--transition);
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            background-color: var(--bg-accent);
-            color: var(--text-main);
-            transform: translateX(4px);
+        nav a:hover,
+        nav a.active {
+            color: var(--text);
+            background: var(--bg);
+            border-left-color: var(--accent);
         }
 
-        /* Main Content */
+        /* Main */
         main {
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
+            padding: 2.5rem;
+            max-width: 1200px;
         }
 
+        /* Header */
         header {
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
         }
 
         header h1 {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--text-main) 0%, var(--text-muted) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
 
-        /* KPI Cards */
-        .kpi-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+        /* Sections */
+        section {
+            margin-bottom: 3.5rem;
+            scroll-margin-top: 2rem;
         }
 
-        .kpi-card {
-            background-color: var(--bg-card);
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--bg-accent);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
         }
 
-        .kpi-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-teal);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-label {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-value {
-            font-family: var(--font-mono);
-            font-size: 1.75rem;
+        .section-header h2 {
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
-        .kpi-subtext {
+        .section-header .section-count {
+            font-family: var(--mono);
             font-size: 0.75rem;
             color: var(--text-muted);
         }
 
-        .kpi-subtext span {
-            font-weight: 600;
-        }
-
-        /* Section Title */
-        section {
-            margin-bottom: 4rem;
-            scroll-margin-top: 2rem;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
             margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
         }
 
-        .section-title::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 1.5rem;
-            background-color: var(--accent-teal);
-            border-radius: 2px;
+        .kpi-card {
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            transition: var(--transition);
         }
 
-        /* Grid for Charts */
+        .kpi-card:hover {
+            background: var(--bg);
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-family: var(--mono);
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.35rem;
+        }
+
+        .kpi-value.accent {
+            color: var(--accent);
+        }
+
+        .kpi-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .kpi-sub span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Chart Grid */
         .chart-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
         }
 
         .chart-card {
-            background-color: var(--bg-card);
+            background: var(--surface);
             padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--bg-accent);
             display: flex;
             flex-direction: column;
-            min-height: 400px;
         }
 
-        .full-width {
+        .chart-card.full {
             grid-column: 1 / -1;
         }
 
         .chart-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
         }
 
-        .chart-header-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .chart-container {
-            flex-grow: 1;
+        .chart-wrap {
             position: relative;
-            width: 100%;
+            flex: 1;
+            min-height: 260px;
         }
 
-        .insight-badge {
+        .chart-wrap.tall {
+            min-height: 320px;
+        }
+
+        .insight {
             margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            background-color: var(--bg-accent);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            display: flex;
-            gap: 0.5rem;
-            border-left: 3px solid var(--accent-amber);
+            padding: 0.625rem 0.875rem;
+            background: var(--bg);
+            border-left: 2px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
 
-        /* Summary Panel */
-        .summary-panel {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
-            padding: 2.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--bg-accent);
-            margin-top: 2rem;
+        .insight strong {
+            color: var(--text);
         }
 
-        .summary-grid {
+        /* Insights Panel */
+        .insights-panel {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .insight-item {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .summary-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.03);
+            grid-template-columns: 40px 1fr;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
             transition: var(--transition);
         }
 
-        .summary-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .insight-item:last-child {
+            border-bottom: none;
         }
 
-        .summary-number {
-            font-family: var(--font-mono);
+        .insight-item:hover {
+            background: var(--bg);
+        }
+
+        .insight-num {
+            font-family: var(--mono);
+            font-size: 0.75rem;
             font-weight: 700;
-            color: var(--accent-teal);
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            width: 32px;
-            height: 32px;
+            color: var(--accent);
+            padding: 1rem;
+            border-right: 1px solid var(--border);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 212, 170, 0.1);
-            border-radius: 50%;
+            align-items: flex-start;
+            padding-top: 1.1rem;
+        }
+
+        .insight-text {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .insight-text strong {
+            color: var(--text);
         }
 
         /* Footer */
         footer {
-            margin-top: 4rem;
             padding-top: 2rem;
-            border-top: 1px solid var(--bg-accent);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
             padding-bottom: 3rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-family: var(--mono);
+        }
+
+        /* Print */
+        @media print {
+            aside {
+                display: none;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .chart-card,
+            .kpi-card {
+                break-inside: avoid;
+            }
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
-            .dashboard-container {
+            .layout {
                 grid-template-columns: 1fr;
             }
+
             aside {
                 display: none;
-            }
-            header h1 {
-                font-size: 2rem;
             }
         }
 
@@ -318,504 +396,526 @@
             .chart-grid {
                 grid-template-columns: 1fr;
             }
+
             main {
-                padding: 1rem;
+                padding: 1.25rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Fade-in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        /* Printing */
-        @media print {
-            body { background: white; color: black; }
-            .no-print { display: none; }
-            .kpi-card, .chart-card, .summary-panel {
-                border: 1px solid #ccc;
-                break-inside: avoid;
-            }
-            .dashboard-container { display: block; }
-            aside { display: none; }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
+
 <body>
-    <div class="dashboard-container">
+    <div class="layout">
+
         <!-- Sidebar -->
-        <aside class="no-print">
-            <div class="logo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                CHURNLYTICS
+        <aside>
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                        stroke-linecap="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                </div>
+                <span class="brand-name">Churnlytics</span>
             </div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="#overview" class="active">Overview</a></li>
-                    <li><a href="#demographics">Demographics</a></li>
-                    <li><a href="#engagement">Engagement</a></li>
-                    <li><a href="#financial">Financial Analysis</a></li>
-                    <li><a href="#insights">Key Insights</a></li>
-                </ul>
-            </nav>
+            <div>
+                <p class="nav-label" style="margin-bottom:0.5rem">Navigation</p>
+                <nav>
+                    <ul>
+                        <li><a href="#overview" class="active">Overview</a></li>
+                        <li><a href="#demographics">Demographics</a></li>
+                        <li><a href="#engagement">Engagement</a></li>
+                        <li><a href="#financial">Financial</a></li>
+                        <li><a href="#insights">Insights</a></li>
+                    </ul>
+                </nav>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main>
-            <header class="animate-fade-in">
-                <h1>Bank Churners EDA</h1>
-                <p>Exploratory Data Analysis Dashboard of 10,127 Credit Card Customers</p>
+            <header>
+                <div class="header-tag">EDA Report</div>
+                <h1>Bank Churners<br>Analysis</h1>
+                <p>10,127 credit card customers &mdash; churn signals, demographics &amp; behavioral patterns</p>
             </header>
 
-            <!-- KPI Summary Cards -->
-            <section id="overview" class="animate-fade-in">
-                <div class="kpi-container">
+            <!-- Section 1: KPIs + Churn Overview -->
+            <section id="overview" class="fade-in">
+                <div class="section-header">
+                    <h2>Overview</h2>
+                    <span class="section-count">6 metrics &middot; 2 charts</span>
+                </div>
+
+                <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-label">Total Customers</div>
                         <div class="kpi-value">10,127</div>
-                        <div class="kpi-subtext">Total credit card database</div>
+                        <div class="kpi-sub">Credit card dataset</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Churned Customers</div>
-                        <div class="kpi-value" style="color: var(--accent-coral)">1,627</div>
-                        <div class="kpi-subtext">Attrited Customers</div>
+                        <div class="kpi-label">Churned</div>
+                        <div class="kpi-value accent">1,627</div>
+                        <div class="kpi-sub">Attrited customers</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Churn Rate</div>
                         <div class="kpi-value">16.07%</div>
-                        <div class="kpi-subtext">Overall attrition percentage</div>
+                        <div class="kpi-sub">Overall attrition</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Avg Credit Limit</div>
                         <div class="kpi-value">$8,613</div>
-                        <div class="kpi-subtext"><span>Ex:</span> $8,727 | <span>Ch:</span> $8,136</div>
+                        <div class="kpi-sub"><span>Ex:</span> $8,727 &middot; <span>Ch:</span> $8,136</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Avg Trans Amount</div>
                         <div class="kpi-value">$4,404</div>
-                        <div class="kpi-subtext"><span>Ex:</span> $4,655 | <span>Ch:</span> $3,095</div>
+                        <div class="kpi-sub"><span>Ex:</span> $4,655 &middot; <span>Ch:</span> $3,095</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Avg Utilization</div>
                         <div class="kpi-value">0.275</div>
-                        <div class="kpi-subtext"><span>Ex:</span> 0.296 | <span>Ch:</span> 0.162</div>
+                        <div class="kpi-sub"><span>Ex:</span> 0.296 &middot; <span>Ch:</span> 0.162</div>
                     </div>
                 </div>
 
                 <div class="chart-grid">
                     <div class="chart-card">
                         <h3>Churn Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="churnDonut"></canvas>
-                        </div>
+                        <div class="chart-wrap"><canvas id="churnDonut"></canvas></div>
                     </div>
                     <div class="chart-card">
-                        <h3>Churn Rate by Demographics</h3>
-                        <div class="chart-container">
-                            <canvas id="churnByDemographics"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>💡</span>
-                            <span>Highest churn: Platinum Cardholders (25%) & Post-Docs (21%).</span>
+                        <h3>Churn Rate by Segment</h3>
+                        <div class="chart-wrap"><canvas id="churnBySegment"></canvas></div>
+                        <div class="insight">
+                            <strong>Highest-risk segments:</strong> Platinum cardholders (25%) and Doctorate holders
+                            (21.06%) churn at significantly above-average rates.
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 4: Customer Demographics -->
-            <section id="demographics" class="animate-fade-in">
-                <h2 class="section-title">Customer Demographics</h2>
+            <!-- Section 4: Demographics -->
+            <section id="demographics" class="fade-in">
+                <div class="section-header">
+                    <h2>Demographics</h2>
+                    <span class="section-count">5 charts</span>
+                </div>
+
                 <div class="chart-grid">
                     <div class="chart-card">
-                        <h3>Gender / Marital Status Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="genderMaritalChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Income distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="incomeDistChart"></canvas>
-                        </div>
+                        <h3>Income Distribution</h3>
+                        <div class="chart-wrap"><canvas id="incomeChart"></canvas></div>
                     </div>
                     <div class="chart-card">
                         <h3>Education Level Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="eduDistChart"></canvas>
-                        </div>
+                        <div class="chart-wrap"><canvas id="eduChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Gender Distribution</h3>
+                        <div class="chart-wrap"><canvas id="genderChart"></canvas></div>
                     </div>
                     <div class="chart-card">
                         <h3>Card Category Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="cardDistChart"></canvas>
-                        </div>
+                        <div class="chart-wrap"><canvas id="cardChart"></canvas></div>
                     </div>
-                    <div class="chart-card full-width">
-                        <h3>Age Distribution (Existing vs Churned)</h3>
-                        <div class="chart-container" style="height: 300px;">
-                            <canvas id="ageDistChart"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>💡</span>
-                            <span>Minimal difference in mean age (Existing: 46.3, Churned: 46.7). Distribution follows similar bell curve.</span>
+                    <div class="chart-card full">
+                        <h3>Age Distribution — Existing vs Churned</h3>
+                        <div class="chart-wrap tall"><canvas id="ageChart"></canvas></div>
+                        <div class="insight">
+                            <strong>Minimal age difference:</strong> Existing mean = 46.3, Churned mean = 46.7. Age
+                            alone is not a useful churn predictor.
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- Section 6: Engagement -->
-            <section id="engagement" class="animate-fade-in">
-                <h2 class="section-title">Behavioral & Engagement Metrics</h2>
+            <section id="engagement" class="fade-in">
+                <div class="section-header">
+                    <h2>Behavioral Signals</h2>
+                    <span class="section-count">3 charts</span>
+                </div>
+
                 <div class="chart-grid">
                     <div class="chart-card">
                         <h3>Months Inactive (Last 12 Mo)</h3>
-                        <div class="chart-container">
-                            <canvas id="inactiveMonthsChart"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>⚠️</span>
-                            <span>Churned customers heavily concentrated at 3 months of inactivity.</span>
+                        <div class="chart-wrap"><canvas id="inactiveChart"></canvas></div>
+                        <div class="insight">
+                            Churned customers are heavily concentrated at <strong>3 months inactive</strong>. Mean
+                            inactive: Existing=2.27, Churned=2.69.
                         </div>
                     </div>
                     <div class="chart-card">
                         <h3>Contact Count (Last 12 Mo)</h3>
-                        <div class="chart-container">
-                            <canvas id="contactCountChart"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>🚨</span>
-                            <span>100% churn rate for customers with 6 contacts (54/54). High contact = High risk.</span>
+                        <div class="chart-wrap"><canvas id="contactChart"></canvas></div>
+                        <div class="insight">
+                            <strong>100% churn rate</strong> for all 54 customers with 6 contacts. High contact
+                            frequency signals unresolved issues.
                         </div>
                     </div>
-                    <div class="chart-card full-width">
-                        <h3>Total Product Relationship Count</h3>
-                        <div class="chart-container" style="height: 300px;">
-                            <canvas id="relationshipChart"></canvas>
+                    <div class="chart-card full">
+                        <h3>Total Product Relationships</h3>
+                        <div class="chart-wrap"><canvas id="relChart"></canvas></div>
+                        <div class="insight">
+                            Fewer product relationships = higher churn risk. Mean: Existing=3.92, Churned=3.28.
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 7: Financial Analysis -->
-            <section id="financial" class="animate-fade-in">
-                <h2 class="section-title">Financial Analysis Comparision</h2>
+            <!-- Section 7: Financial -->
+            <section id="financial" class="fade-in">
+                <div class="section-header">
+                    <h2>Financial Analysis</h2>
+                    <span class="section-count">3 charts</span>
+                </div>
+
                 <div class="chart-grid">
-                    <div class="chart-card full-width">
-                        <h3>Key Financial Metric % Difference (Churned vs Existing)</h3>
-                        <div class="chart-container" style="height: 350px;">
-                            <canvas id="financialMetricComparison"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>💡</span>
-                            <span>Churned customers show significantly lower Revolving Bal (-46%), Utilization (-45%), and Transaction Count (-35%).</span>
+                    <div class="chart-card full">
+                        <h3>% Difference — Key Metrics (Churned vs Existing)</h3>
+                        <div class="chart-wrap tall"><canvas id="metricDiff"></canvas></div>
+                        <div class="insight">
+                            Churned customers show significantly lower <strong>Revolving Balance (−46%)</strong>,
+                            <strong>Utilization (−45%)</strong>, <strong>Trans Count (−35%)</strong>, and <strong>Trans
+                                Amount (−33%)</strong>.
                         </div>
                     </div>
                     <div class="chart-card">
                         <h3>Utilization Ratio Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="utilizationDistChart"></canvas>
-                        </div>
-                        <div class="insight-badge">
-                            <span>💡</span>
-                            <span>65.7% of churned customers have utilization < 0.1 — essentially dormant accounts.</span>
+                        <div class="chart-wrap"><canvas id="utilChart"></canvas></div>
+                        <div class="insight">
+                            <strong>65.7%</strong> of churned customers have utilization below 0.1 — essentially dormant
+                            accounts.
                         </div>
                     </div>
                     <div class="chart-card">
                         <h3>Credit Limit Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="creditLimitDistChart"></canvas>
-                        </div>
+                        <div class="chart-wrap"><canvas id="creditChart"></canvas></div>
                     </div>
                 </div>
             </section>
 
             <!-- Section 8: Insights -->
-            <section id="insights" class="animate-fade-in">
-                <h2 class="section-title">Executive Summary & Key findings</h2>
-                <div class="summary-panel">
-                    <div class="summary-grid" id="insights-list">
-                        <!-- Will be populated by JS -->
-                    </div>
+            <section id="insights" class="fade-in">
+                <div class="section-header">
+                    <h2>Key Findings</h2>
+                    <span class="section-count">10 insights</span>
                 </div>
+                <div class="insights-panel" id="insights-list"></div>
             </section>
 
             <footer>
-                Bank Churners EDA Dashboard — Data: 10,127 customers | Generated with AI-assisted analysis
+                Bank Churners EDA Dashboard &mdash; Data: 10,127 customers | Generated with AI-assisted analysis
             </footer>
         </main>
     </div>
 
     <script>
-        // Global Chart Defaults
-        Chart.defaults.color = '#a0a0a0';
-        Chart.defaults.font.family = "'DM Sans', sans-serif";
-        Chart.defaults.plugins.tooltip.backgroundColor = '#1a1d2e';
-        Chart.defaults.plugins.tooltip.borderColor = '#252a41';
+        // ── Defaults ──────────────────────────────────────────────
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = '#555555';
+        Chart.defaults.plugins.tooltip.backgroundColor = '#111111';
+        Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+        Chart.defaults.plugins.tooltip.bodyColor = '#cccccc';
+        Chart.defaults.plugins.tooltip.borderColor = '#333333';
         Chart.defaults.plugins.tooltip.borderWidth = 1;
-        Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: 'bold' };
-        Chart.defaults.plugins.tooltip.bodyFont = { size: 13 };
-        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.legend.labels.boxWidth = 10;
+        Chart.defaults.plugins.legend.labels.padding = 14;
 
-        const colors = {
-            existing: '#00d4aa',
-            churned: '#ff6b6b',
-            accent: '#ffb86c',
-            palette: ['#00d4aa', '#ff6b6b', '#ffb86c', '#4facfe', '#667eea', '#f093fb']
+        // Palette
+        const C = {
+            black: '#111111',
+            grey1: '#333333',
+            grey2: '#666666',
+            grey3: '#aaaaaa',
+            grey4: '#dddddd',
+            accent: '#e63946',
+            white: '#ffffff',
+            alphaB: 'rgba(17,17,17,0.06)',
         };
 
-        // Section 2: Churn Donut
+        const gridOpts = {
+            color: '#eeeeee',
+            drawBorder: false,
+        };
+
+        // ── Helpers ───────────────────────────────────────────────
+        function barDefaults(indexAxis = 'x') {
+            return {
+                indexAxis,
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: indexAxis === 'x' ? gridOpts : { display: false }, border: { display: false } },
+                    y: { grid: indexAxis === 'y' ? gridOpts : { display: false }, border: { display: false } },
+                }
+            };
+        }
+
+        function groupedBar() {
+            return {
+                ...barDefaults(),
+                plugins: { legend: { position: 'top', align: 'end' } },
+                scales: {
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: { grid: gridOpts, border: { display: false } }
+                }
+            };
+        }
+
+        // ── Section 2 — Churn Donut ───────────────────────────────
         new Chart(document.getElementById('churnDonut'), {
             type: 'doughnut',
             data: {
-                labels: ['Existing Customer', 'Attrited Customer'],
+                labels: ['Existing (83.93%)', 'Churned (16.07%)'],
                 datasets: [{
                     data: [8500, 1627],
-                    backgroundColor: [colors.existing, colors.churned],
+                    backgroundColor: [C.black, C.accent],
                     borderWidth: 0,
-                    hoverOffset: 15
+                    hoverOffset: 10,
                 }]
             },
             options: {
-                cutout: '70%',
+                cutout: '68%',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
+                plugins: { legend: { position: 'bottom' } }
             }
         });
 
-        // Section 3: Churn by Demographics (Mock logic for switching categories)
-        new Chart(document.getElementById('churnByDemographics'), {
+        // ── Section 3 — Churn by Segment (horizontal) ────────────
+        new Chart(document.getElementById('churnBySegment'), {
             type: 'bar',
             data: {
                 labels: ['Female', 'Male', 'Blue', 'Silver', 'Gold', 'Platinum', 'Graduate', 'Doctorate', 'Married', 'Single'],
                 datasets: [{
                     label: 'Churn Rate %',
                     data: [17.36, 14.62, 16.10, 14.77, 18.10, 25.00, 15.57, 21.06, 15.13, 16.94],
-                    backgroundColor: function(context) {
-                        const val = context.raw;
-                        return val > 20 ? colors.churned : colors.existing;
-                    },
-                    borderRadius: 6
+                    backgroundColor: ctx => ctx.raw >= 20 ? C.accent : C.black,
+                    borderRadius: 2,
                 }]
             },
             options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
+                ...barDefaults('y'),
                 scales: {
-                    x: { grid: { display: false }, ticks: { callback: v => v + '%' } },
-                    y: { grid: { display: false } }
+                    x: { grid: gridOpts, border: { display: false }, ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false }, border: { display: false } }
                 }
             }
         });
 
-        // Section 4a: Gender/Marital
-        new Chart(document.getElementById('genderMaritalChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Female', 'Male', 'Married', 'Single', 'Divorced', 'Unknown'],
-                datasets: [{
-                    data: [5358, 4769, 4687, 3943, 748, 749],
-                    backgroundColor: colors.palette,
-                    borderWidth: 0
-                }]
-            },
-            options: { cutout: '60%', responsive: true, maintainAspectRatio: false }
-        });
-
-        // Section 4b: Income
-        new Chart(document.getElementById('incomeDistChart'), {
+        // ── Section 4 — Demographics ──────────────────────────────
+        new Chart(document.getElementById('incomeChart'), {
             type: 'bar',
             data: {
-                labels: ['< $40K', '$40K-60K', '$60K-80K', '$80K-120K', '$120K+', 'Unknown'],
+                labels: ['< $40K', '$40K–60K', '$60K–80K', '$80K–120K', '$120K+', 'Unknown'],
                 datasets: [{
-                    label: 'Count',
                     data: [3561, 1790, 1402, 1535, 727, 1112],
-                    backgroundColor: colors.existing,
-                    borderRadius: 6
+                    backgroundColor: [C.black, C.grey1, C.grey2, C.grey1, C.grey2, C.grey3],
+                    borderRadius: 2,
                 }]
             },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+            options: { ...barDefaults('y'), plugins: { legend: { display: false } } }
         });
 
-        // Section 4d: Education
-        new Chart(document.getElementById('eduDistChart'), {
+        new Chart(document.getElementById('eduChart'), {
             type: 'bar',
             data: {
                 labels: ['Graduate', 'High School', 'Unknown', 'Uneducated', 'College', 'Post-Grad', 'Doctorate'],
                 datasets: [{
-                    label: 'Count',
                     data: [3128, 2013, 1519, 1487, 1013, 516, 451],
-                    backgroundColor: '#4facfe',
-                    borderRadius: 6
+                    backgroundColor: C.black,
+                    borderRadius: 2,
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: barDefaults()
         });
 
-        // Section 4c: Card Category
-        new Chart(document.getElementById('cardDistChart'), {
-            type: 'pie',
+        new Chart(document.getElementById('genderChart'), {
+            type: 'doughnut',
             data: {
-                labels: ['Blue', 'Silver', 'Gold', 'Platinum'],
+                labels: ['Female (5,358)', 'Male (4,769)'],
+                datasets: [{
+                    data: [5358, 4769],
+                    backgroundColor: [C.black, C.grey3],
+                    borderWidth: 0,
+                }]
+            },
+            options: { cutout: '65%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('cardChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Blue (9,436)', 'Silver (555)', 'Gold (116)', 'Platinum (20)'],
                 datasets: [{
                     data: [9436, 555, 116, 20],
-                    backgroundColor: colors.palette,
-                    borderWidth: 0
+                    backgroundColor: [C.black, C.grey1, C.grey2, C.grey3],
+                    borderWidth: 0,
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { cutout: '65%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Section 5: Age Dist
-        new Chart(document.getElementById('ageDistChart'), {
+        new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: {
-                labels: ['26-30', '31-35', '36-40', '41-45', '46-50', '51-55', '56-60', '61-65', '66-75'],
+                labels: ['26–30', '31–35', '36–40', '41–45', '46–50', '51–55', '56–60', '61–65', '66–75'],
                 datasets: [
-                    { label: 'Existing', data: [233, 564, 1258, 1878, 1995, 1452, 773, 339, 8], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [32, 90, 220, 386, 393, 295, 153, 56, 2], backgroundColor: colors.churned }
+                    { label: 'Existing', data: [233, 564, 1258, 1878, 1995, 1452, 773, 339, 8], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [32, 90, 220, 386, 393, 295, 153, 56, 2], backgroundColor: C.accent, borderRadius: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+            options: {
+                ...groupedBar(),
+                plugins: { legend: { display: true, position: 'top', align: 'end' } },
+            }
         });
 
-        // Section 6a: Inactive
-        new Chart(document.getElementById('inactiveMonthsChart'), {
-            type: 'bar',
-            data: {
-                labels: ['0', '1', '2', '3', '4', '5', '6'],
-                datasets: [
-                    { label: 'Existing', data: [14, 2133, 2777, 3020, 305, 146, 105], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [15, 100, 505, 826, 130, 32, 19], backgroundColor: colors.churned }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
-        // Section 6b: Contacts
-        new Chart(document.getElementById('contactCountChart'), {
+        // ── Section 6 — Behavioral ───────────────────────────────
+        new Chart(document.getElementById('inactiveChart'), {
             type: 'bar',
             data: {
                 labels: ['0', '1', '2', '3', '4', '5', '6'],
                 datasets: [
-                    { label: 'Existing', data: [392, 1391, 2824, 2699, 1077, 117, 0], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [7, 108, 403, 681, 315, 59, 54], backgroundColor: colors.churned }
+                    { label: 'Existing', data: [14, 2133, 2777, 3020, 305, 146, 105], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [15, 100, 505, 826, 130, 32, 19], backgroundColor: C.accent, borderRadius: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: groupedBar()
         });
 
-        // Section 6c: Relationships
-        new Chart(document.getElementById('relationshipChart'), {
+        new Chart(document.getElementById('contactChart'), {
+            type: 'bar',
+            data: {
+                labels: ['0', '1', '2', '3', '4', '5', '6'],
+                datasets: [
+                    { label: 'Existing', data: [392, 1391, 2824, 2699, 1077, 117, 0], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [7, 108, 403, 681, 315, 59, 54], backgroundColor: C.accent, borderRadius: 2 }
+                ]
+            },
+            options: groupedBar()
+        });
+
+        new Chart(document.getElementById('relChart'), {
             type: 'bar',
             data: {
                 labels: ['1', '2', '3', '4', '5', '6'],
                 datasets: [
-                    { label: 'Existing', data: [677, 897, 1905, 1687, 1664, 1670], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [233, 346, 400, 225, 227, 196], backgroundColor: colors.churned }
+                    { label: 'Existing', data: [677, 897, 1905, 1687, 1664, 1670], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [233, 346, 400, 225, 227, 196], backgroundColor: C.accent, borderRadius: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: groupedBar()
         });
 
-        // Section 7a: Financial Comparison (% change)
-        new Chart(document.getElementById('financialMetricComparison'), {
+        // ── Section 7 — Financial ────────────────────────────────
+        new Chart(document.getElementById('metricDiff'), {
             type: 'bar',
             data: {
-                labels: ['Total Trans Ct', 'Avg Utilization', 'Total Revolving Bal', 'Total Trans Amt', 'Avg Open To Buy', 'Credit Limit', 'Months on Book'],
+                labels: ['Trans Count', 'Utilization', 'Revolving Bal', 'Trans Amount', 'Open To Buy', 'Credit Limit', 'Months on Book'],
                 datasets: [{
-                    label: '% Difference (Churned vs Existing)',
+                    label: '% Change vs Existing',
                     data: [-34.5, -45.2, -46.4, -33.5, -6.0, -6.8, 0.8],
-                    backgroundColor: ctx => ctx.raw < 0 ? colors.churned : colors.existing,
-                    borderRadius: 6
+                    backgroundColor: ctx => ctx.raw < 0 ? C.accent : C.black,
+                    borderRadius: 2,
                 }]
             },
-            options: { 
-                indexAxis: 'y', 
-                responsive: true, 
-                maintainAspectRatio: false,
+            options: {
+                ...barDefaults('y'),
                 scales: {
-                    x: { ticks: { callback: v => v + '%' } }
+                    x: { grid: gridOpts, border: { display: false }, ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false }, border: { display: false } }
                 }
             }
         });
 
-        // Section 7c: Utilization Dist
-        new Chart(document.getElementById('utilizationDistChart'), {
+        new Chart(document.getElementById('utilChart'), {
             type: 'bar',
             data: {
-                labels: ['0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5', '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0'],
+                labels: ['0.0–0.1', '0.1–0.2', '0.2–0.3', '0.3–0.4', '0.4–0.5', '0.5–0.6', '0.6–0.7', '0.7–0.8', '0.8–0.9', '0.9–1.0'],
                 datasets: [
-                    { label: 'Existing', data: [2984, 1172, 819, 588, 620, 696, 699, 550, 285, 87], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [1069, 121, 88, 70, 51, 47, 44, 42, 71, 24], backgroundColor: colors.churned }
+                    { label: 'Existing', data: [2984, 1172, 819, 588, 620, 696, 699, 550, 285, 87], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [1069, 121, 88, 70, 51, 47, 44, 42, 71, 24], backgroundColor: C.accent, borderRadius: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: groupedBar()
         });
 
-        // Section 7b: Credit Limit Dist
-        new Chart(document.getElementById('creditLimitDistChart'), {
+        new Chart(document.getElementById('creditChart'), {
             type: 'bar',
             data: {
-                labels: ['$0-5K', '$5K-10K', '$10K-15K', '$15K-20K', '$20K-25K', '$25K+'],
+                labels: ['$0–5K', '$5K–10K', '$10K–15K', '$15K–20K', '$20K–25K', '$25K+'],
                 datasets: [
-                    { label: 'Existing', data: [4433, 1712, 796, 479, 329, 751], backgroundColor: colors.existing },
-                    { label: 'Churned', data: [926, 302, 145, 70, 43, 141], backgroundColor: colors.churned }
+                    { label: 'Existing', data: [4433, 1712, 796, 479, 329, 751], backgroundColor: C.black, borderRadius: 2 },
+                    { label: 'Churned', data: [926, 302, 145, 70, 43, 141], backgroundColor: C.accent, borderRadius: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: groupedBar()
         });
 
-        // Insights Panel Population
+        // ── Insights List ─────────────────────────────────────────
         const insights = [
-            "<strong>Churn Rate:</strong> 16.07% of customers have churned (1,627 sample).",
-            "<strong>Gender Risk:</strong> Females churn more (17.36%) vs males (14.62%).",
-            "<strong>Tier Risk:</strong> Platinum cardholders face 25% churn — the highest segment risk.",
-            "<strong>Education:</strong> Doctorate holders churn significantly more (21.06%).",
-            "<strong>Inactivity Signal:</strong> 3+ months of inactivity is a critical churn predictor.",
-            "<strong>Contact Overload:</strong> 100% churn rate observed at 6 customer contacts.",
-            "<strong>Product Engagement:</strong> Customers with < 3 products have much higher risk.",
-            "<strong>Low Utilization:</strong> 65.7% of churned users have utilization below 0.1.",
-            "<strong>Transaction Value:</strong> Churned users show 33% lower transaction spend.",
-            "<strong>Activity Decline:</strong> Transaction count change ratio is 25% lower for churners."
+            '<strong>Churn Rate:</strong> 16.07% of customers have churned — 1,627 out of 10,127.',
+            '<strong>Gender:</strong> Female customers churn more (17.36%) vs male customers (14.62%).',
+            '<strong>Card Tier Risk:</strong> Platinum cardholders have the highest churn at 25%, followed by Gold at 18.1%.',
+            '<strong>Education:</strong> Doctorate holders churn the most (21.06%), likely due to higher expectations.',
+            '<strong>Inactivity Signal:</strong> Customers inactive for 3+ months are at highest churn risk.',
+            '<strong>Contact Overload:</strong> 100% of customers who contacted the bank 6 times churned — a strong complaint signal.',
+            '<strong>Product Engagement:</strong> Customers with fewer bank products (1–2) churn at much higher rates.',
+            '<strong>Low Utilization = High Risk:</strong> 65.7% of churned customers have utilization ratios below 0.1.',
+            '<strong>Transaction Drop:</strong> Churned customers show 33% lower transaction amounts and 35% fewer transactions.',
+            '<strong>Q4 vs Q1 Decline:</strong> Churned customers show declining activity — Q4/Q1 ratio: 0.554 vs 0.742.',
         ];
 
-        const container = document.getElementById('insights-list');
+        const panel = document.getElementById('insights-list');
         insights.forEach((text, i) => {
-            const item = document.createElement('div');
-            item.className = 'summary-item';
-            item.innerHTML = `
-                <div class="summary-number">${i + 1}</div>
-                <div class="summary-text">${text}</div>
-            `;
-            container.appendChild(item);
+            panel.innerHTML += `
+        <div class="insight-item">
+            <div class="insight-num">${String(i + 1).padStart(2, '0')}</div>
+            <div class="insight-text">${text}</div>
+        </div>`;
         });
 
-        // Interactivity: Nav links active state
+        // ── Nav Active State ──────────────────────────────────────
+        const navLinks = document.querySelectorAll('nav a');
         window.addEventListener('scroll', () => {
-            let current = "";
-            document.querySelectorAll('section').forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
+            let current = '';
+            document.querySelectorAll('section').forEach(s => {
+                if (window.scrollY >= s.offsetTop - 120) current = s.id;
             });
-
-            document.querySelectorAll('.nav-links a').forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href').includes(current)) {
-                    a.classList.add('active');
-                }
+            navLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + current);
             });
         });
+
+        // ── Fade-in on Scroll ─────────────────────────────────────
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
 </body>
+
 </html>
